@@ -1,0 +1,70 @@
+#!/bin/bash
+#
+# mountHDD.sh
+#
+
+devHddDir=/dev/sda1
+extHddDir=/media
+
+    fi
+
+    if [ $1 != $currentStatus ]
+    then
+        if [ $1 = "on" ]
+        then
+            echo "Starting $service"
+            service resilio-sync start
+        elif [ $1 = "off" ]
+        then
+            echo "Stopping $service"
+            service resilio-sync stop
+        else
+            echo "Incorect operation. Please use on/off"
+        fi
+    fi
+}
+
+echo "netdrive monitoring script started"
+
+while true
+do
+#   ping 192.168.0.1 -c 10
+
+    if [ ! -d "$archDir" ] || [ ! -d "$asysDir" ] || [ ! -d "$mfirDir" ] || [ ! -d "$mproDir" ];
+    then
+        echo "USB drive connection lost - reconnecting ..."
+        umount $extHddDir
+        mount -t ext3 $devHddDir $extHddDir
+        if [ $? -eq 0 ];
+        then
+            echo "USB disk drive mounted :)"
+        else
+            echo "USB disk drive mounting failed !!!"
+        fi
+    fi
+
+
+    if [[ $(date +%u) -gt 5 ]] # check if it's weekend
+    then
+        echo "It's weekend. Turning sync on"
+        switchResilio on
+    elif [[ $(date +%H) -gt 19 ]]
+    then
+        echo "It's after 20h. Turning sync on"
+        switchResilio on
+    elif [[ $(date +%H) -lt 6 ]]
+    then
+        echo "It's before 6h. Turning sync on"
+        switchResilio on
+    else
+        echo "It's working hours. Turning sync off"
+        switchResilio off
+    fi
+
+
+    sleep 10m
+
+done
+
+exit 0
+
