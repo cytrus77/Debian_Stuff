@@ -1,0 +1,46 @@
+#!/bin/bash
+#
+# netdrive.sh
+#
+
+devHddDir=/dev/sda1
+extHddDir=/media
+archDir=/media/ARCHIWUM
+asysDir=/media/ASYSTENT_PROJEKTOW
+mfirDir=/media/MENADZER_FIRMY
+mproDir=/media/MENADZER_PROJEKTOW
+
+
+echo "netdrive monitoring script started"
+
+while true
+do
+    ping www.wp.pl -c 1
+    if [ $? -ne 0 ]
+    then
+        echo "Ping failed."
+        systemctl daemon-reload
+        systemctl restart networking.service
+    fi
+
+    if [ ! -d "$archDir" ] || [ ! -d "$asysDir" ] || [ ! -d "$mfirDir" ] || [ ! -d "$mproDir" ];
+    then
+        echo "USB drive connection lost - reconnecting ..."
+        umount $extHddDir
+        mount $devHddDir $extHddDir
+        if [ $? -eq 0 ];
+        then
+            echo "USB disk drive mounted :)"
+            sleep 10
+            systemctl restart resilio-sync.service
+        else
+            echo "USB disk drive mounting failed !!!"
+        fi
+    fi
+
+    sleep 10m
+
+done
+
+exit 0
+
