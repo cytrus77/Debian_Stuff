@@ -1,0 +1,22 @@
+#!/bin/bash
+#
+# netmonitor
+#
+
+echo "network monitoring script started"
+
+while true
+do
+    ping www.wp.pl -c 1
+    if [ $? -ne 0 ]
+    then
+        echo "Ping failed."
+        systemctl daemon-reload
+        systemctl restart networking.service
+    fi
+
+    sleep 10m
+done
+
+exit 0
+
