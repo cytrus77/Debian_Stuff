@@ -35,6 +35,17 @@ do_reset_id()
 	return 0
 }
 
+do_uninstall()
+{
+        echo "Stopping $LOGGINGNAME service"
+        systemctl stop $SERVICENAME
+
+        echo "Uninstalling $LOGGINGNAME"
+        dpkg -r logmein-hamachi
+
+        echo "Done"
+        return 0
+}
 
 case "$1" in
   install)
@@ -51,8 +62,16 @@ case "$1" in
 		1|*) echo "Some problem occurred !" ;;
 	esac
 	;;
+  uninstall)
+        do_uninstall
+        case "$?" in
+                0) echo "All OK" ;;
+                1|*) echo "Some problem occurred !" ;;
+        esac
+        ;;
+
   *)
-	echo "Usage: $SCRIPTNAME {install|resetid}" >&2
+	echo "Usage: $SCRIPTNAME {install|resetid|uninstall}" >&2
 	exit 3
 	;;
 esac
