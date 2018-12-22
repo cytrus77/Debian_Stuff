@@ -47,6 +47,18 @@ do_uninstall()
         return 0
 }
 
+do_networkfix()
+{
+        echo "Delete old default gateway"
+        route del default
+
+        echo "Setting new default gateway - $newIp"
+        route add default gw $newIp
+
+        echo "Done"
+        return 0
+}
+
 case "$1" in
   install)
     do_install
@@ -69,9 +81,18 @@ case "$1" in
                 1|*) echo "Some problem occurred !" ;;
         esac
         ;;
+  fixnetwork)
+        newIp=$2
+        do_networkfix
+        case "$?" in
+                0) echo "All OK" ;;
+                1|*) echo "Some problem occurred !" ;;
+        esac
+        ;;
+
 
   *)
-	echo "Usage: $SCRIPTNAME {install|resetid|uninstall}" >&2
+	echo "Usage: $SCRIPTNAME {install|resetid|uninstall|fixnetwork}" >&2
 	exit 3
 	;;
 esac
