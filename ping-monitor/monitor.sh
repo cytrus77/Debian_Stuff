@@ -10,7 +10,9 @@ STATUS_FILE="/usr/local/bin/monitor/status_now"
 DOWN_LAST_FILE="/usr/local/bin/monitor/down_last"
 
 HOSTS_LIST=$(cat $HOSTS_FILE)
-DOWN_NOW_LIST=()
+declare -A RECOVERED_LIST
+DEGRADEDED_LIST=()
+declare -A DOWN_NOW_LIST
 readarray DOWN_LAST_LIST < $DOWN_LAST_FILE
 
 
@@ -25,40 +27,51 @@ for myHost in $HOSTS_LIST;
     ping -q -c 3 $IP > /dev/null
     if [ ! $? -eq 0 ]
       then
-        SEND_NOTIF=1
-        DOWN_NOW_LIST[${#DOWN_NOW_LIST[@]}]="${IP}"
+        DEGRADEDED_FLAG=1
+        DOWN_NOW_LIST[$NAME]="${IP}"
 
         for DOWN_IP in "${DOWN_LAST_LIST[@]}"
         do
             DOWN_IP=${DOWN_IP%$'\n'}
             if [[ "$DOWN_IP" == "$IP" ]]; then
-                SEND_NOTIF=0
+                DEGRADEDED_FLAG=0
                 break
             fi
         done
 
-        if [ "$SEND_NOTIF" -eq "1" ]; then
-            echo "$myHost failed"
-            echo "Host: $NAME - [$IP] is unresponsive (ping failed)" >> $STATUS_FILE
+        if [ "$DEGRADEDED_FLAG" -eq "1" ]; then
+            DEGRADEDED_LIST[${#DEGRADEDED_LIST[@]}]="${IP}"
         fi
     else
-        SEND_NOTIF=0
-
         for DOWN_IP in "${DOWN_LAST_LIST[@]}"
         do
             DOWN_IP=${DOWN_IP%$'\n'}
             if [[ "$DOWN_IP" == "$IP" ]]; then
-                SEND_NOTIF=1
+                RECOVERED_LIST['$NAME']="${IP}"
                 break
             fi
         done
-
-        if [ "$SEND_NOTIF" -eq "1" ]; then
-            echo "$myHost back online"
-            echo "Host: $NAME - [$IP] is back online" >> $STATUS_FILE
-        fi
     fi
 done
+
+
+if [[ "${#RECOVERED_LIST[@]}" -gt "0" ]] || [[ ! -z "$DEGRADEDED_LIST" ]]
+then
+    for NAME in "${!RECOVERED_LIST[@]}"
+    do
+        IP=${RECOVERED_LIST[$NAME]}
+        echo "$NAME - $IP back ONLINE"
+        echo "Host: $NAME - [$IP] is back ONLINE" >> $STATUS_FILE
+    done
+
+    for NAME in "${!DOWN_NOW_LIST[@]}"
+    do
+        IP=${DOWN_NOW_LIST[$NAME]}
+        echo "$NAME - $IP FAILED"
+        echo "Host: $NAME - [$IP] is unresponsive (ping FAILED)" >> $STATUS_FILE
+    done
+fi
+
 
 ## Email that list and remove the file for next check
 SUBJECT="[ALERT] [$LOCATION] Host(s) Unresponsive!"
@@ -79,12 +92,13 @@ if [[ -z "$diff" ]]; then
     exit 0
 fi
 
+
 ## update last down list in file
-if [ ! -z "$DOWN_NOW_LIST" ]
+if [ "${#DOWN_NOW_LIST[@]}" -gt "0" ]
 then
-      printf "%s\n" "${DOWN_NOW_LIST[@]}" > $DOWN_LAST_FILE
+    printf "%s\n" "${DOWN_NOW_LIST[@]}" > $DOWN_LAST_FILE
 else
-      echo "DOWN NOW LIST is empty"
+    echo "DOWN NOW LIST is empty"
 fi
 
 exit 0
