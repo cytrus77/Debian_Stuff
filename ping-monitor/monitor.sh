@@ -2,7 +2,7 @@
 # Simple Ping Monitor for hosts v0.3  | Charles Phillips | cphilllips.ia@gmail.com
 #
 # We parse this file to retrieve Hosts
-LOCATION="KLECZKO"
+LOCATION="MAKO"
 EMAILID="cytrus77@gmail.com"
 
 HOSTS_FILE="/usr/local/bin/monitor/hosts.list"
@@ -47,7 +47,7 @@ for myHost in $HOSTS_LIST;
         do
             DOWN_IP=${DOWN_IP%$'\n'}
             if [[ "$DOWN_IP" == "$IP" ]]; then
-                RECOVERED_LIST['$NAME']="${IP}"
+                RECOVERED_LIST[$NAME]="${IP}"
                 break
             fi
         done
@@ -61,20 +61,24 @@ then
     do
         IP=${RECOVERED_LIST[$NAME]}
         echo "$NAME - $IP back ONLINE"
-        echo "Host: $NAME - [$IP] is back ONLINE" >> $STATUS_FILE
+        echo -e "[$IP]\t$NAME\tback ONLINE" >> $STATUS_FILE
     done
+
+    echo "=============================================================="
 
     for NAME in "${!DOWN_NOW_LIST[@]}"
     do
         IP=${DOWN_NOW_LIST[$NAME]}
         echo "$NAME - $IP FAILED"
-        echo "Host: $NAME - [$IP] is unresponsive (ping FAILED)" >> $STATUS_FILE
+        echo -e "[$IP]\t$NAME\tunresponsive (ping FAILED)" >> $STATUS_FILE
     done
 fi
 
 
 ## Email that list and remove the file for next check
-SUBJECT="[ALERT] [$LOCATION] Host(s) Unresponsive!"
+R_COUNT=${#RECOVERED_LIST[@]}
+F_COUNT=${#DOWN_NOW_LIST[@]}
+SUBJECT="[ALERT] [$LOCATION] Recovered=[$R_COUNT] Unresponsive=[$F_COUNT]"
 
 #Send email and remove list
 if [ -e $STATUS_FILE ];
