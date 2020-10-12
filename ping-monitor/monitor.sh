@@ -65,7 +65,7 @@ then
         echo -e "[$IP]\t\t$NAME\t\tback ONLINE" >> $STATUS_FILE
     done
 
-    echo -e "==============================================================\n\n" >> $STATUS_FILE
+    echo -e "==============================================================\n" >> $STATUS_FILE
 fi
 
 if [[ "${#DEGRADEDED_LIST[@]}" -gt "0" ]]
@@ -78,18 +78,21 @@ then
         echo -e "[$IP]\t\t$NAME\t\tunresponsive (NEW)" >> $STATUS_FILE
     done
 
-    echo -e "==============================================================\n\n" >> $STATUS_FILE
+    echo -e "==============================================================\n" >> $STATUS_FILE
 fi
 
 if [[ "${#DOWN_NOW_LIST[@]}" -gt "0" ]]
 then
-    echo "Offline - [${#DOWN_NOW_LIST[@]}]" >> $STATUS_FILE
-    for NAME in "${!DOWN_NOW_LIST[@]}"
-    do
-        IP=${DOWN_NOW_LIST[$NAME]}
-        echo "$NAME - $IP FAILED"
-        echo -e "[$IP]\t\t$NAME\t\tunresponsive (ping FAILED)" >> $STATUS_FILE
-    done
+    if [[ "${#DEGRADEDED_LIST[@]}" -gt "0" ]] || [[ "${#RECOVERED_LIST[@]}" -gt "0" ]]
+    then
+        echo "Offline - [${#DOWN_NOW_LIST[@]}]" >> $STATUS_FILE
+        for NAME in "${!DOWN_NOW_LIST[@]}"
+        do
+            IP=${DOWN_NOW_LIST[$NAME]}
+            echo "$NAME - $IP FAILED"
+            echo -e "[$IP]\t\t$NAME\t\tunresponsive (ping FAILED)" >> $STATUS_FILE
+        done
+    fi
 fi
 
 
