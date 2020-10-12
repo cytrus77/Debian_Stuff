@@ -11,7 +11,7 @@ DOWN_LAST_FILE="/usr/local/bin/monitor/down_last"
 
 HOSTS_LIST=$(cat $HOSTS_FILE)
 declare -A RECOVERED_LIST
-DEGRADEDED_LIST=()
+declare -A DEGRADEDED_LIST
 declare -A DOWN_NOW_LIST
 readarray DOWN_LAST_LIST < $DOWN_LAST_FILE
 
@@ -40,7 +40,7 @@ for myHost in $HOSTS_LIST;
         done
 
         if [ "$DEGRADEDED_FLAG" -eq "1" ]; then
-            DEGRADEDED_LIST[${#DEGRADEDED_LIST[@]}]="${IP}"
+            DEGRADEDED_LIST[$NAME]="${IP}"
         fi
     else
         for DOWN_IP in "${DOWN_LAST_LIST[@]}"
@@ -55,22 +55,40 @@ for myHost in $HOSTS_LIST;
 done
 
 
-if [[ "${#RECOVERED_LIST[@]}" -gt "0" ]] || [[ ! -z "$DEGRADEDED_LIST" ]]
+if [[ "${#RECOVERED_LIST[@]}" -gt "0" ]]
 then
+    echo "Recovered - [${#RECOVERED_LIST[@]}]" >> $STATUS_FILE
     for NAME in "${!RECOVERED_LIST[@]}"
     do
         IP=${RECOVERED_LIST[$NAME]}
         echo "$NAME - $IP back ONLINE"
-        echo -e "[$IP]\t$NAME\tback ONLINE" >> $STATUS_FILE
+        echo -e "[$IP]\t\t$NAME\t\tback ONLINE" >> $STATUS_FILE
     done
 
-    echo "=============================================================="
+    echo -e "==============================================================\n\n" >> $STATUS_FILE
+fi
 
+if [[ "${#DEGRADEDED_LIST[@]}" -gt "0" ]]
+then
+    echo "Degradaded - [${#DEGRADEDED_LIST[@]}]" >> $STATUS_FILE
+    for NAME in "${!DEGRADEDED_LIST[@]}"
+    do
+        IP=${DEGRADEDED_LIST[$NAME]}
+        echo "$NAME - $IP FAILED"
+        echo -e "[$IP]\t\t$NAME\t\tunresponsive (NEW)" >> $STATUS_FILE
+    done
+
+    echo -e "==============================================================\n\n" >> $STATUS_FILE
+fi
+
+if [[ "${#DOWN_NOW_LIST[@]}" -gt "0" ]]
+then
+    echo "Offline - [${#DOWN_NOW_LIST[@]}]" >> $STATUS_FILE
     for NAME in "${!DOWN_NOW_LIST[@]}"
     do
         IP=${DOWN_NOW_LIST[$NAME]}
         echo "$NAME - $IP FAILED"
-        echo -e "[$IP]\t$NAME\tunresponsive (ping FAILED)" >> $STATUS_FILE
+        echo -e "[$IP]\t\t$NAME\t\tunresponsive (ping FAILED)" >> $STATUS_FILE
     done
 fi
 
@@ -103,6 +121,7 @@ then
     printf "%s\n" "${DOWN_NOW_LIST[@]}" > $DOWN_LAST_FILE
 else
     echo "DOWN NOW LIST is empty"
+    rm $DOWN_LAST_FILE
 fi
 
 exit 0
