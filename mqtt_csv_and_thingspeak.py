@@ -94,10 +94,17 @@ def thingspeak_update_all():
         fullURL = fullURL + '&field2=' + str(TEMP_DS1)
 
     print(fullURL)
-    thingspeak = urllib3.PoolManager()
-    f = thingspeak.request('GET', fullURL)
-    f.read()
-    f.close()
+    try:
+        thingspeak = urllib3.PoolManager()
+        f = thingspeak.request('GET', fullURL)
+        f.read()
+        f.close()
+    except thingspeak.exceptions.ConnectTimeoutError:
+        print( "ConnectTimeoutError" )
+    except thingspeak.exceptions.ConnectionError:
+        print( "ConnectionError" )
+    except thingspeak.exceptions.NewConnectionError:
+        print( "NewConnectionError" )
 
 
 def thingspeak_update(sensor, value):
