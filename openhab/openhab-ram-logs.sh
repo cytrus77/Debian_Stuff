@@ -48,8 +48,6 @@ sudo sh -ce "echo 'exit 0' >> /etc/rc.local"
 #Needed so frontail can still find the files
 sudo ln -sf /tmpfs/events.log /var/log/openhab2/events.log
 sudo ln -sf /tmpfs/openhab.log /var/log/openhab2/openhab.log
-#redirect the ntpdrift file
-sudo sed -i -e 's#driftfile /var/lib/ntp/ntp.drift#driftfile /tmpfs/ntp.drift#g' /etc/ntp.conf
 
 #New method of redirecting Opehabs logs
 sudo sed -i -e 's#log4j2.appender.event.fileName = ${openhab.logdir}/events.log#log4j2.appender.event.fileName = /tmpfs/events.log#g' /var/lib/openhab2/etc/org.ops4j.pax.logging.cfg
