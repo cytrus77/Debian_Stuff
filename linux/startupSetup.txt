@@ -1,0 +1,10 @@
+/root/Debian_Stuff/swappiness-five-percent.sh
+
+/bin/sleep 5
+/root/Debian_Stuff/hamachiOpt.sh fixnetwork 192.168.116.1
+/bin/sleep 3
+/bin/systemctl restart logmein-hamachi.service
+/bin/sleep 3
+/etc/init.d/logmein-hamachi start'
+/bin/sleep 2
+/usr/bin/hamachi login
