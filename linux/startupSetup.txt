@@ -5,7 +5,7 @@
 /bin/sleep 3
 /bin/systemctl restart logmein-hamachi.service
 /bin/sleep 3
-/etc/init.d/logmein-hamachi start'
+/etc/init.d/logmein-hamachi start
 /bin/sleep 2
 /usr/bin/hamachi logout
 /bin/sleep 2
