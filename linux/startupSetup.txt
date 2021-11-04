@@ -7,4 +7,23 @@
 /bin/sleep 3
 /etc/init.d/logmein-hamachi start'
 /bin/sleep 2
+/usr/bin/hamachi logout
+/bin/sleep 2
+/usr/bin/hamachi login
+
+
+===============================================================
+
+
+/home/cytrus/Debian_stuff/swappiness-five-percent.sh
+
+/bin/sleep 5
+/home/cytrus/Debian_stuff/hamachiOpt.sh fixnetwork 192.168.100.1
+/bin/sleep 10
+/bin/systemctl restart logmein-hamachi.service
+/bin/sleep 3
+/etc/init.d/logmein-hamachi start
+/bin/sleep 2
+/usr/bin/hamachi logout
+/bin/sleep 2
 /usr/bin/hamachi login
