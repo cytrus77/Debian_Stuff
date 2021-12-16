@@ -12,6 +12,7 @@ RestartSec=60
 User=root
 ExecStartPre=-/sbin/route del default
 ExecStart=/sbin/route add default gw 192.168.38.1
+ExecStartPost=/usr/bin/hamachi login
 
 [Install]
 WantedBy=multi-user.target
@@ -21,3 +22,4 @@ WantedBy=multi-user.target
 sudo systemctl daemon-reload
 sudo systemctl start hamachiPre.service
 sudo systemctl status hamachiPre.service
+sudo systemctl enable hamachiPre.service
