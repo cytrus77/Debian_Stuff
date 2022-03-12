@@ -1,0 +1,24 @@
+cat /etc/systemd/system/tuya-mqtt.service
+=================================================
+[Unit]
+Description=Tuya Mqtt
+After=network.target rc-local.service
+
+[Service]
+Type=simple
+Restart=on-failure
+User=root
+ExecStart=/usr/bin/node /opt/tuya-mqtt/tuya-mqtt.js
+
+[Install]
+WantedBy=multi-user.target
+
+=================================================
+
+sudo systemctl daemon-reload
+sudo systemctl start tuya-mqtt.service
+sudo systemctl status tuya-mqtt.service
+sudo systemctl enable tuya-mqtt.service
+
+//
+remember to change devices.conf to absolute path in /opt/tuya-mqtt/tuya-mqtt.js
