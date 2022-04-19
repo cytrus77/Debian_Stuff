@@ -1,0 +1,15 @@
+// add rule
+Rule1
+  ON Power1#state=1 DO RuleTimer1 5 ENDON
+  ON Rules#Timer=1 DO Power1 off ENDON
+
+// to enable  
+Rule1 1
+
+// add rule
+Rule2
+  ON Power2#state=1 DO RuleTimer2 5 ENDON
+  ON Rules#Timer=2 DO Power2 off ENDON
+
+// to enable  
+Rule2 1
