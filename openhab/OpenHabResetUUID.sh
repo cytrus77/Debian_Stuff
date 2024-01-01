@@ -3,14 +3,14 @@
 # OpenHabResetUUID.sh
 #
 echo "Stopping OpenHab service"
-systemctl stop openhab2.service
+systemctl stop openhab.service
 
 echo "Removing OpenHab UUID file"
-rm /var/lib/openhab2/uuid
+rm /var/lib/openhab/uuid
 echo "Removing Openhab secret file"
-rm /var/lib/openhab2/openhabcloud/secret
+rm /var/lib/openhab/openhabcloud/secret
 
 echo "Starting OpenHab service"
-systemctl start openhab2.service
+systemctl start openhab.service
 
 echo "Done"
