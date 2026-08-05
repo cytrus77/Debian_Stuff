@@ -6,31 +6,50 @@ This project measures internet download speed, upload speed, latency (ping), and
 
 ## 🚀 Why Official Ookla Speedtest CLI?
 
-We recommend the **Official Ookla Speedtest CLI** (`speedtest`) over the Python `speedtest-cli` script because:
-1. **Accuracy on High-Speed Connections**: Supports Gigabit (1000+ Mbps) internet speeds without CPU or thread bottlenecking.
+We use the **Official Ookla Speedtest CLI** (`speedtest`) instead of python `speedtest-cli` because:
+1. **Accuracy on High-Speed Connections**: Supports Gigabit (1000+ Mbps) internet speeds without CPU bottlenecks.
 2. **Native JSON Output**: Outputs structured data including latency jitter, ISP info, and server metadata via `speedtest --format=json`.
-3. **Reliability**: Uses official Ookla speedtest servers and standard protocol headers.
+3. **Reliability**: Uses official Ookla speedtest servers and avoids rate-limiting / package manager distribution mismatches (e.g. Linux Mint / Debian derivative codenames).
 
 ---
 
-## 🛠️ Installation & Setup Options
+## 🛠️ Installation & Setup
 
-### Option 1: Native Systemd Service & Timer (Recommended for Debian/Linux)
+### 1. Install Ookla Speedtest CLI (Direct Binary Installation)
 
-#### 1. Install Official Ookla Speedtest CLI
+Download and extract the official Ookla binary directly to `/usr/local/bin`:
+
+#### For x86_64 (Intel/AMD 64-bit):
 ```bash
-sudo apt-get update
-sudo apt-get install -y curl
-curl -s https://packagecloud.io/install/repositories/ookla/speedtest-cli/script.deb.sh | sudo bash
-sudo apt-get install -y speedtest
+curl -sL "https://install.speedtest.net/app/cli/ookla-speedtest-1.2.0-linux-x86_64.tgz" | tar -xz -C /tmp
+sudo mv /tmp/speedtest /usr/local/bin/
+sudo chmod +x /usr/local/bin/speedtest
 ```
 
-#### 2. Install Python Dependencies
+#### For ARM64 (Raspberry Pi 64-bit / ARM64):
+```bash
+curl -sL "https://install.speedtest.net/app/cli/ookla-speedtest-1.2.0-linux-aarch64.tgz" | tar -xz -C /tmp
+sudo mv /tmp/speedtest /usr/local/bin/
+sudo chmod +x /usr/local/bin/speedtest
+```
+
+Verify installation:
+```bash
+speedtest --version
+```
+
+---
+
+### 2. Install Python Dependencies
+
 ```bash
 pip3 install -r requirements.txt
 ```
 
-#### 3. Setup Systemd Hourly Timer
+---
+
+### 3. Setup Systemd Hourly Service & Timer
+
 Copy project files to `/opt/speedtest-mqtt` and enable systemd timer:
 
 ```bash
@@ -45,7 +64,7 @@ sudo systemctl daemon-reload
 sudo systemctl enable --now speedtest-mqtt.timer
 ```
 
-To run a test immediately manually:
+To trigger a test manually:
 ```bash
 sudo systemctl start speedtest-mqtt.service
 ```
@@ -54,7 +73,7 @@ sudo systemctl start speedtest-mqtt.service
 
 ### Option 2: Docker / Docker Compose
 
-Run using Docker Compose:
+Build and run using Docker Compose:
 
 ```bash
 docker-compose up -d --build
