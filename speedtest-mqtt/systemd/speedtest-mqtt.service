@@ -1,0 +1,16 @@
+[Unit]
+Description=Speedtest MQTT Publisher Service
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+User=root
+WorkingDirectory=/opt/speedtest-mqtt
+Environment="MQTT_BROKER=localhost"
+Environment="MQTT_PORT=1883"
+Environment="MQTT_TOPIC_PREFIX=speedtest"
+ExecStart=/usr/bin/python3 /opt/speedtest-mqtt/speedtest_mqtt.py
+
+[Install]
+WantedBy=multi-user.target

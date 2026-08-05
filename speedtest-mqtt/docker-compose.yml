@@ -1,0 +1,14 @@
+version: '3.8'
+
+services:
+  speedtest-mqtt:
+    build: .
+    container_name: speedtest-mqtt
+    restart: unless-stopped
+    environment:
+      - MQTT_BROKER=192.168.1.100  # Change to your MQTT broker IP/hostname
+      - MQTT_PORT=1883
+      - MQTT_USER=
+      - MQTT_PASS=
+      - MQTT_TOPIC_PREFIX=speedtest
+      - HA_DISCOVERY=true
