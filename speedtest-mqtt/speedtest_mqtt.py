@@ -119,7 +119,10 @@ def main():
     results = run_speedtest()
     print(f"Results: Download={results['download_mbps']} Mbps, Upload={results['upload_mbps']} Mbps, Ping={results['ping_ms']} ms")
 
-    client = mqtt.Client(mqtt.CallbackAPIVersion.VERSION2)
+    if hasattr(mqtt, "CallbackAPIVersion"):
+        client = mqtt.Client(mqtt.CallbackAPIVersion.VERSION2)
+    else:
+        client = mqtt.Client()
     if MQTT_USER and MQTT_PASS:
         client.username_pw_set(MQTT_USER, MQTT_PASS)
 
